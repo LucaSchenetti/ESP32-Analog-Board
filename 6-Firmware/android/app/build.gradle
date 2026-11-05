@@ -1,0 +1,31 @@
+// IT: App IO Tester: Android 7.0+ (collegamento automatico al WiFi da Android 10).
+// EN: IO Tester app: Android 7.0+ (automatic WiFi connection from Android 10).
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.iotester.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.iotester.app'
+        minSdk 24
+        targetSdk 35
+        versionCode 6
+        versionName '1.5'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            // IT: firmata con la chiave di debug di questo PC (uso interno) / EN: signed with this PC's debug key (internal use)
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

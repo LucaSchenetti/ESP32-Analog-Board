@@ -1,0 +1,107 @@
+<!doctype html>
+<!--
+  IO Tester — Calibrazione / Calibration
+  IT: Stato della calibrazione dei 5 canali e procedure guidate: ingressi a due punti con multimetro
+      di riferimento, uscite automatiche in loopback; collegamento e informazioni sul metodo.
+  EN: Calibration state of the 5 channels and guided procedures: two-point inputs with a reference
+      multimeter, automatic loopback outputs; wiring and method information.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Calibrazione</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/cal.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-tool cal-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-target"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_tool">Strumento</span><span class="sep">·</span><span class="mono">P1 · P2</span></div>
+        <h1 data-i18n="cal_title">Calibrazione</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="cal_st_idle">PRONTA</span><p data-i18n="cal_sub">Ingressi con Multimetro di Riferimento, Uscite in Loopback</p></div>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <!-- IT: Canali e procedura / EN: Channels and procedure -->
+      <div class="stack">
+        <section class="card panel p-chans">
+          <div class="panel-head"><h2 data-i18n="cal_chans">Canali</h2><span class="summary-sub" data-i18n="cal_order">Ordine Consigliato: 1 → 5</span></div>
+          <div id="chan-list" class="chan-list"></div>
+        </section>
+
+        <section id="p-proc" class="card panel p-proc">
+          <h2 id="proc-title" data-i18n="cal_proc">Procedura</h2>
+          <div id="proc" class="proc"></div>
+        </section>
+      </div>
+
+      <!-- IT: Collegamento e informazioni / EN: Wiring and information -->
+      <div class="stack">
+        <section class="card panel p-wr">
+          <div class="panel-head"><h2 data-i18n="wr_title">Collegamento</h2><span id="wr-ch" class="summary-sub"></span></div>
+          <svg id="wiring" class="wiring" viewBox="0 0 600 280" role="img" aria-label="Schema di collegamento / Wiring diagram"></svg>
+          <p id="wr-note" class="hint"></p>
+        </section>
+
+        <section class="card panel p-info">
+          <h2 data-i18n="cal_info">Informazioni sul Metodo</h2>
+          <dl class="info">
+            <div><dt data-i18n="i_cal_order_k">Ordine</dt><dd data-i18n="i_cal_order"></dd></div>
+            <div><dt data-i18n="i_cal_in_k">Ingressi</dt><dd data-i18n="i_cal_in"></dd></div>
+            <div><dt data-i18n="i_cal_out_k">Uscite</dt><dd data-i18n="i_cal_out"></dd></div>
+            <div><dt data-i18n="i_cal_dmm_k">Multimetro</dt><dd data-i18n="i_cal_dmm"></dd></div>
+            <div><dt data-i18n="i_cal_warm_k">Preparazione</dt><dd data-i18n="i_cal_warm"></dd></div>
+            <div><dt data-i18n="i_cal_lim_k">Limiti</dt><dd data-i18n="i_cal_lim"></dd></div>
+            <div><dt data-i18n="i_cal_mem_k">Memoria</dt><dd data-i18n="i_cal_mem"></dd></div>
+            <div><dt data-i18n="i_cal_vout_k">Uscita Tensione</dt><dd data-i18n="i_cal_vout"></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

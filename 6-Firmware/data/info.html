@@ -1,0 +1,166 @@
+<!doctype html>
+<!--
+  IO Tester — Info app / App info
+  IT: Informazioni sullo strumento (versione firmware, compilazione, partizioni, creatore), aggiornamento del
+      firmware (.bin) e dell'interfaccia web (littlefs.bin) dal browser con controllo del file, avanzamento,
+      riavvio e ricollegamento; copia e cancellazione della memoria NVS.
+  EN: Instrument information (firmware version, build, partitions, creator), firmware (.bin) and web
+      interface (littlefs.bin) update from the browser with file check, progress, restart and reconnection;
+      copy and erase of the NVS memory.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Info App</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/info.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-tool upd-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-info"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_tool">Strumento</span></div>
+        <h1 data-i18n="up_title">Info App</h1>
+        <div class="head-sub"><span id="state" class="state-chip">–</span><p data-i18n="up_sub">Versione, Aggiornamento e Memoria</p></div>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <div class="stack">
+        <section class="card panel about">
+          <div class="about-head">
+            <img class="about-logo" src="img/icon.svg" alt="">
+            <div>
+              <div class="about-name">IO Tester</div>
+              <div class="about-desc" data-i18n="brand_sub">Calibratore I/O analogici</div>
+            </div>
+          </div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_fw">Firmware</span><span id="s-afw" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="up_built">Compilato il</span><span id="s-abuilt" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k">ESP-IDF</span><span id="s-aidf" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="up_running">Partizione in Uso</span><span id="s-arun" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="up_hw">Hardware</span><span class="v">PCB rev.A · ESP32-S3FN8</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="up_author">Creatore</span><span class="v">Luca Schenetti</span></div>
+        </section>
+        <section class="card panel up-panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-chip"/></svg><span data-i18n="up_fw">Aggiorna Firmware</span></h2><span class="summary-sub" data-i18n="up_fw_sub">File .bin dal Browser</span></div>
+          <div id="fw-rows"></div>
+          <label class="file-pick" for="fw-file">
+            <input id="fw-file" type="file" accept=".bin,application/octet-stream">
+            <svg class="icon"><use href="img/icons.svg#ic-upload"/></svg>
+            <span id="fw-name" data-i18n="up_pick">Scegli il file .bin</span>
+          </label>
+          <p class="hint mono" data-i18n="up_fw_hint"></p>
+          <p id="fw-msg" class="alert" role="alert" hidden></p>
+          <div id="fw-prog" class="up-prog" hidden>
+            <div class="progress"><div id="fw-bar" class="progress-fill"></div></div>
+            <p id="fw-step" class="run-step"></p>
+          </div>
+          <div class="actions single"><button id="fw-go" class="btn btn-lg btn-primary" type="button" disabled data-i18n="up_fw_btn"></button></div>
+        </section>
+        <section class="card panel up-panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-home"/></svg><span data-i18n="up_fs">Aggiorna Interfaccia</span></h2><span class="summary-sub" data-i18n="up_fs_sub">Pagine Web (LittleFS)</span></div>
+          <div id="fs-rows"></div>
+          <label class="file-pick" for="fs-file">
+            <input id="fs-file" type="file" accept=".bin,application/octet-stream">
+            <svg class="icon"><use href="img/icons.svg#ic-upload"/></svg>
+            <span id="fs-name" data-i18n="up_pick">Scegli il file .bin</span>
+          </label>
+          <p class="hint mono" data-i18n="up_fs_hint"></p>
+          <p id="fs-msg" class="alert" role="alert" hidden></p>
+          <div id="fs-prog" class="up-prog" hidden>
+            <div class="progress"><div id="fs-bar" class="progress-fill"></div></div>
+            <p id="fs-step" class="run-step"></p>
+          </div>
+          <div class="actions single"><button id="fs-go" class="btn btn-lg btn-primary" type="button" disabled data-i18n="up_fs_btn"></button></div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-target"/></svg><span data-i18n="up_nvs">Memoria NVS</span></h2><span class="summary-sub" data-i18n="up_nvs_sub">Coefficienti di Calibrazione</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="up_nvs_used">Voci Usate / Totali</span><span id="s-nvs" class="v">–</span></div>
+          <div class="tbl-wrap"><table class="cal-table"><thead><tr><th data-i18n="up_th_ch"></th><th data-i18n="k_gain">Guadagno</th><th data-i18n="k_offset">Offset</th><th data-i18n="up_th_date"></th></tr></thead><tbody id="cal-rows"></tbody></table></div>
+          <div class="actions single"><button id="nvs-copy" class="btn" type="button" data-i18n="up_copy">COPIA DEI COEFFICIENTI</button></div>
+          <textarea id="cal-json" class="json-box" rows="8" readonly hidden></textarea>
+          <a id="cal-dl" class="dl-link" hidden data-i18n="up_dl">Scarica il file JSON</a>
+          <div class="danger">
+            <h3><svg class="icon"><use href="img/icons.svg#ic-trash"/></svg><span data-i18n="up_erase_h">Elimina NVS</span></h3>
+            <p data-i18n="up_erase_txt"></p>
+            <label class="label" for="nvs-confirm" data-i18n="up_erase_type">Per confermare scrivere ELIMINA</label>
+            <div class="field"><input id="nvs-confirm" type="text" autocomplete="off" autocapitalize="characters" placeholder="ELIMINA"></div>
+            <div class="actions single"><button id="nvs-erase" class="btn btn-lg btn-danger" type="button" disabled data-i18n="up_erase_btn">ELIMINA NVS E RIAVVIA</button></div>
+            <p id="nvs-msg" class="hint"></p>
+          </div>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-lock"/></svg><span data-i18n="pin_panel">PIN di Servizio</span></h2><span class="summary-sub" data-i18n="pin_panel_sub">Protegge Aggiornamenti, Calibrazione ed Elimina NVS</span></div>
+          <div class="row"><span id="d-pin" class="dot"></span><span class="k" data-i18n="pin_state">Stato</span><span id="s-pin" class="v">–</span></div>
+          <div class="sc-grid pin-grid">
+            <label class="sc-f"><span class="k" data-i18n="pin_old">PIN Attuale</span><span class="field"><input id="pin-old" type="password" inputmode="numeric" autocomplete="off" maxlength="8"></span></label>
+            <span></span>
+            <label class="sc-f"><span class="k" data-i18n="pin_new">Nuovo PIN (4–8 Cifre)</span><span class="field"><input id="pin-new" type="password" inputmode="numeric" autocomplete="off" maxlength="8"></span></label>
+            <label class="sc-f"><span class="k" data-i18n="pin_new2">Ripeti il Nuovo PIN</span><span class="field"><input id="pin-new2" type="password" inputmode="numeric" autocomplete="off" maxlength="8"></span></label>
+          </div>
+          <div class="actions single"><button id="pin-change" class="btn" type="button" data-i18n="pin_change">CAMBIA PIN</button></div>
+          <p id="pin-msg" class="hint"></p>
+        </section>
+
+        <section class="card panel p-info">
+          <h2 data-i18n="up_info">Informazioni</h2>
+          <dl class="info">
+            <div><dt data-i18n="up_i_safe_k">Sicurezza</dt><dd data-i18n="up_i_safe"></dd></div>
+            <div><dt data-i18n="up_i_slots_k">Due Partizioni</dt><dd data-i18n="up_i_slots"></dd></div>
+            <div><dt data-i18n="up_i_keep_k">Cosa Resta</dt><dd data-i18n="up_i_keep"></dd></div>
+            <div><dt data-i18n="up_i_app_k">App Android</dt><dd data-i18n="up_i_app"></dd></div>
+            <div><dt data-i18n="up_i_fail_k">In Caso di Problemi</dt><dd data-i18n="up_i_fail"></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

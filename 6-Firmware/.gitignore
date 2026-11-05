@@ -1,0 +1,15 @@
+# PlatformIO
+.pio/
+.vscode/*
+!.vscode/extensions.json
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+*.keystore
+*.jks
+
+# AI assistant notes
+CLAUDE.md
+.claude/

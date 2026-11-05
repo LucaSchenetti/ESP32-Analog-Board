@@ -1,0 +1,189 @@
+<!doctype html>
+<!--
+  IO Tester — Genera corrente 4–20 mA / Generate current 4–20 mA
+  IT: Uscita in corrente attiva (P1.3 mA+ / P1.1 COM) verso un ingresso passivo del PLC: valori rapidi,
+      regolazione fine, avviso di circuito aperto, dettagli tecnici, collegamento e informazioni.
+  EN: Active current output (P1.3 mA+ / P1.1 COM) into a passive PLC input: quick values, fine
+      adjustment, open-circuit warning, technical details, wiring and information.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Genera Corrente 4F</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/scale.js" defer></script>
+  <script src="js/output-page.js" defer></script>
+  <script src="js/gen-i.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-gen dock-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-amp"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_gen">Genera</span><span class="sep">·</span><span class="mono">P1.3 mA+ · P1.1 COM</span></div>
+        <h1 data-i18n="gi_title">Genera Corrente 4F</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="st_off">SPENTA</span><p data-i18n="gi_sub">4–20 / 0–20 mA · Uscita Attiva Isolata</p></div>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <!-- IT: Comandi / EN: Controls -->
+      <div class="stack">
+        <section id="p-set" class="card panel p-set">
+          <h2 data-i18n="sp_title">Impostazione</h2>
+          <span class="label" data-i18n="sp_now">Uscita attuale</span>
+          <div id="readout" class="readout off"><span id="now-val" class="num">–</span><span class="unit">mA</span></div>
+
+          <label class="label" for="sp" data-i18n="sp_label">Valore da generare</label>
+          <div id="sp-field" class="field">
+            <input id="sp" type="text" inputmode="decimal" autocomplete="off" value="12,000">
+            <span class="unit">mA</span>
+          </div>
+          <div id="sp-err" class="err-text"></div>
+
+          <span class="label" data-i18n="sp_quick">Valori rapidi</span>
+          <div class="btn-row cols-5">
+            <button class="btn" type="button" data-v="4">4</button>
+            <button class="btn" type="button" data-v="8">8</button>
+            <button class="btn" type="button" data-v="12">12</button>
+            <button class="btn" type="button" data-v="16">16</button>
+            <button class="btn" type="button" data-v="20">20</button>
+          </div>
+
+          <span class="label" data-i18n="sp_step">Regolazione fine</span>
+          <div class="btn-row cols-6">
+            <button class="btn" type="button" data-step="-1">−1</button>
+            <button class="btn" type="button" data-step="-0.1">−0,1</button>
+            <button class="btn" type="button" data-step="-0.01">−0,01</button>
+            <button class="btn" type="button" data-step="0.01">+0,01</button>
+            <button class="btn" type="button" data-step="0.1">+0,1</button>
+            <button class="btn" type="button" data-step="1">+1</button>
+          </div>
+
+          <p id="switch-note" class="hint warn" data-i18n="sp_switch" hidden></p>
+          <p id="fault-alert" class="alert" role="alert" hidden></p>
+          <!-- IT: sul telefono barra fissa in basso / EN: on the phone, bar fixed at the bottom -->
+          <div class="actions dock">
+            <button id="btn-apply" class="btn btn-lg btn-primary" type="button" data-i18n="btn_enable">ATTIVA USCITA</button>
+            <button id="btn-stop" class="btn btn-lg btn-danger" type="button" data-i18n="btn_stop">SPEGNI</button>
+          </div>
+          <p class="hint" data-i18n="sp_hint">Con l'uscita attiva, valori rapidi e regolazione fine vengono applicati subito.</p>
+        </section>
+
+        <!-- IT: Pannello operatore in unità ingegneristiche (scale.js) / EN: Operator panel in engineering units (scale.js) -->
+        <section id="p-scale" class="card panel p-scale"></section>
+
+        <!-- IT: Dettagli tecnici, sempre visibili / EN: Technical details, always visible -->
+        <section class="card panel p-rb">
+          <div class="panel-head"><h2 data-i18n="rb_title">Dettagli Tecnici</h2><span class="summary-sub" data-i18n="rb_sub">Rilettura dal Chip AD5412</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="rb_expected">Valore Atteso</span><span id="s-exp" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="rb_nominal">Valore Nominale</span><span id="s-nom" class="v">–</span></div>
+          <div class="row"><span id="d-code" class="dot"></span><span class="k" data-i18n="rb_code">Codice DAC Scritto / Riletto</span><span id="s-code" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="rb_ctrl">Registro di Controllo</span><span id="s-ctrl" class="v">–</span></div>
+          <div class="row"><span id="d-fault" class="dot"></span><span class="k" data-i18n="k_fault">FAULT</span><span id="s-fault" class="v">–</span></div>
+          <div class="row"><span id="d-cal" class="dot"></span><span class="k" data-i18n="rb_cal">Calibrazione Uscita</span><span id="s-cal" class="v">–</span></div>
+          <div class="row"><span id="d-loop" class="dot"></span><span id="k-loop" class="k"></span><span id="s-loop" class="v">–</span></div>
+          <p class="hint" data-i18n="rb_loop_hint_i">Solo collegando P1.3 mA+ → P2.4 mA+ e P1.1 COM → P2.3 mA−</p>
+        </section>
+      </div>
+
+      <!-- IT: Collegamento e informazioni / EN: Wiring and information -->
+      <div class="stack">
+        <section class="card panel p-wr">
+          <h2 data-i18n="wr_title">Collegamento</h2>
+          <svg id="wiring" class="wiring" viewBox="0 0 600 260" role="img" aria-label="Schema di collegamento / Wiring diagram">
+            <!-- IO Tester, P1 OUTPUT -->
+            <rect class="wr-box" x="8" y="8" width="252" height="244" rx="14"/>
+            <text class="wr-title" x="24" y="36" data-i18n="wr_cal">IO Tester · P1 OUTPUT</text>
+            <rect class="wr-strip" x="200" y="56" width="40" height="184" rx="6"/>
+            <circle class="wr-term used" cx="220" cy="80" r="9"/>
+            <circle class="wr-term" cx="220" cy="124" r="9"/>
+            <circle class="wr-term used" cx="220" cy="168" r="9"/>
+            <circle class="wr-term" cx="220" cy="212" r="9"/>
+            <text class="wr-label" x="190" y="84" text-anchor="end">P1.1 COM</text>
+            <text class="wr-label free" x="190" y="128" text-anchor="end">P1.2 SIM+</text>
+            <text class="wr-label pos" x="190" y="172" text-anchor="end">P1.3 mA+</text>
+            <text class="wr-label free" x="190" y="216" text-anchor="end">P1.4 V+</text>
+            <line class="wr-stub" x1="229" y1="124" x2="250" y2="124"/>
+            <line class="wr-stub" x1="229" y1="212" x2="250" y2="212"/>
+            <text class="wr-free" x="256" y="128" data-i18n="wr_free">libero</text>
+            <text class="wr-free" x="256" y="216" data-i18n="wr_free">libero</text>
+
+            <!-- PLC -->
+            <rect class="wr-box" x="380" y="60" width="210" height="160" rx="14"/>
+            <text class="wr-title" x="410" y="92" data-i18n="wr_plc">Ingresso Analogico</text>
+            <text class="wr-sub" x="410" y="112" data-i18n="wr_plc_sub_i">PLC · 4–20 mA passivo</text>
+            <rect class="wr-strip" x="366" y="122" width="28" height="86" rx="5"/>
+            <circle class="wr-term used" cx="380" cy="142" r="8"/>
+            <circle class="wr-term used" cx="380" cy="188" r="8"/>
+            <text class="wr-label" x="410" y="146">M− / COM</text>
+            <text class="wr-label pos" x="410" y="192">M+ / 4–20 mA</text>
+
+            <!-- Fili / Wires -->
+            <polyline class="wr-com" points="229,80 300,80 300,142 371,142"/>
+            <polyline class="wr-pos" points="229,168 320,168 320,188 371,188"/>
+            <!-- IT: Flusso animato quando l'uscita è attiva / EN: Animated flow while the output is on -->
+            <polyline class="wr-flow" points="229,168 320,168 320,188 371,188"/>
+            <polyline class="wr-flow com" points="371,142 300,142 300,80 229,80"/>
+          </svg>
+          <p class="hint" data-i18n="wr_note_i"></p>
+        </section>
+
+        <section class="card panel p-info">
+          <h2 data-i18n="in_title">Informazioni sulla Misura</h2>
+          <dl class="info">
+            <div><dt data-i18n="i_range_k">Campo</dt><dd data-i18n="i_range_i"></dd></div>
+            <div><dt data-i18n="i_res_k">Risoluzione</dt><dd data-i18n="i_res_i"></dd></div>
+            <div><dt data-i18n="i_acc_k">Precisione</dt><dd data-i18n="i_acc_i"></dd></div>
+            <div><dt data-i18n="i_load_k">Carico</dt><dd data-i18n="i_load_i"></dd></div>
+            <div><dt data-i18n="i_open_k">Circuito Aperto</dt><dd data-i18n="i_open_i"></dd></div>
+            <div><dt data-i18n="i_iso_k">Isolamento</dt><dd data-i18n="i_iso_i"></dd></div>
+            <div><dt data-i18n="i_safe_k">Sicurezza</dt><dd data-i18n="i_safe_i"></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<!--
+  IO Tester — Autotest / Self-test
+  IT: Verifica dello strumento in loopback con disegno dei collegamenti (4 fili numerati e colorati), procedura
+      automatica di circa 1 minuto, tabella dei risultati ed esito STRUMENTO OK / DA CONTROLLARE; prova facoltativa del 2F.
+  EN: Loopback check of the instrument with wiring diagram (4 numbered, coloured wires), automatic procedure of
+      about 1 minute, results table and INSTRUMENT OK / TO CHECK outcome; optional 2W test.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Autotest</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/autotest.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-tool at-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-check"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_tool">Strumento</span><span class="sep">·</span><span class="mono">P1 → P2</span></div>
+        <h1 data-i18n="at_title">Autotest</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="cal_st_idle">PRONTA</span><p data-i18n="at_sub">Verifica dello Strumento in Circa 1 Minuto</p></div>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <div class="stack">
+        <!-- IT: Collegamento / EN: Wiring -->
+        <section id="p-wr" class="card panel p-wr">
+          <div class="panel-head"><h2 data-i18n="wr_title">Collegamento</h2><span id="wr-mode" class="summary-sub"></span></div>
+          <svg id="wiring" class="wiring" viewBox="0 0 492 270" role="img" aria-label="Schema di collegamento / Wiring diagram"></svg>
+          <ol id="wire-list" class="wire-list"></ol>
+          <p id="wr-note" class="hint"></p>
+        </section>
+
+        <section class="card panel p-info">
+          <h2 data-i18n="at_info">Cosa Controlla</h2>
+          <dl class="info">
+            <div><dt data-i18n="at_i_spi_k">Chip</dt><dd data-i18n="at_i_spi"></dd></div>
+            <div><dt data-i18n="at_i_v_k">Tensione</dt><dd data-i18n="at_i_v"></dd></div>
+            <div><dt data-i18n="at_i_i_k">Corrente</dt><dd data-i18n="at_i_i"></dd></div>
+            <div><dt data-i18n="at_i_s_k">2F (Facoltativo)</dt><dd data-i18n="at_i_s"></dd></div>
+            <div><dt data-i18n="at_i_lim_k">Limiti</dt><dd data-i18n="at_i_lim"></dd></div>
+            <div><dt data-i18n="at_i_when_k">Quando Farlo</dt><dd data-i18n="at_i_when"></dd></div>
+          </dl>
+        </section>
+      </div>
+
+      <div class="stack">
+        <!-- IT: Procedura e risultati / EN: Procedure and results -->
+        <section class="card panel p-set">
+          <div class="panel-head"><h2 data-i18n="at_run">Prova</h2><span class="summary-sub" data-i18n="at_run_sub">Valori Calibrati, Lettura dagli Ingressi</span></div>
+          <div id="at-sum" class="at-sum" hidden>
+            <div class="at-sum-ico"><svg class="icon"><use href="img/icons.svg#ic-check"/></svg></div>
+            <div><div id="at-sum-t" class="at-sum-t"></div><div id="at-sum-d" class="at-sum-d"></div><div id="at-sum-e" class="at-sum-e" hidden></div></div>
+          </div>
+          <label class="check-opt"><input id="chk-wire" type="checkbox"> <span data-i18n="at_chk_wire">Ho collegato i fili come nel disegno</span></label>
+          <label class="check-opt"><input id="chk-free" type="checkbox"> <span data-i18n="at_chk_free">Nessun altro dispositivo collegato a P1 e P2</span></label>
+          <div class="actions single">
+            <button id="at-go" class="btn btn-lg btn-primary" type="button" disabled>AVVIA AUTOTEST</button>
+          </div>
+          <div id="at-prog" class="at-prog" hidden>
+            <div class="progress"><div id="at-bar" class="progress-fill"></div></div>
+            <p id="at-step" class="run-step"></p>
+            <div class="actions single"><button id="at-stop" class="btn btn-lg btn-danger" type="button" data-i18n="btn_abort">INTERROMPI</button></div>
+          </div>
+          <div class="tbl-wrap"><table id="at-table" class="cal-table at-table" hidden>
+            <thead><tr><th data-i18n="at_th_test">Prova</th><th data-i18n="at_th_exp">Atteso</th><th data-i18n="at_th_read">Letto</th><th data-i18n="cal_th_dev">Scarto</th><th data-i18n="at_th_lim">Limite</th></tr></thead>
+            <tbody id="at-rows"></tbody>
+          </table></div>
+          <div class="actions single"><button id="at-sink" class="btn btn-lg" type="button" data-i18n="at_sink_btn" hidden>PROVA ANCHE IL 2F (SECONDO COLLEGAMENTO)</button></div>
+          <div class="actions single"><button id="at-back" class="btn btn-lg" type="button" data-i18n="at_back_btn" hidden>TORNA AL COLLEGAMENTO PRINCIPALE</button></div>
+          <p class="hint" data-i18n="at_limit_note"></p>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

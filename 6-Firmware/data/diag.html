@@ -1,0 +1,166 @@
+<!doctype html>
+<!--
+  IO Tester — Diagnostica / Diagnostics
+  IT: Stato di tutti i componenti (alimentazione, AD5412, ADS1220, ESP32-S3, WiFi), test SPI con rilettura,
+      diagnostica dell'antenna (potenza TX, segnale dei dispositivi, reti vicine), prova di LED e cicalino.
+  EN: State of every component (supply, AD5412, ADS1220, ESP32-S3, WiFi), SPI tests with read-back,
+      antenna diagnostics (TX power, device signal, nearby networks), LED and buzzer test.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Diagnostica</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/diag.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-tool diag-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-chip"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_tool">Strumento</span></div>
+        <h1 data-i18n="dg_title">Diagnostica</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="conn_wait">–</span><p data-i18n="dg_sub">Stato dei Componenti, Test e Antenna</p></div>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <div class="stack">
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-power"/></svg><span data-i18n="sec_supply"></span></h2></div>
+          <div class="row"><span id="d-src" class="dot"></span><span class="k" data-i18n="k_source">Sorgente</span><span id="s-src" class="v">–</span></div>
+          <div class="row"><span id="d-vusb" class="dot"></span><span class="k" data-i18n="k_vusb">Tensione USB</span><span id="s-vusb" class="v">–</span></div>
+          <div class="row"><span id="d-24" class="dot"></span><span class="k" data-i18n="k_ext24">Ingresso 24 V</span><span id="s-24" class="v">–</span></div>
+          <div class="row"><span id="d-5" class="dot"></span><span class="k" data-i18n="k_ext5">Ingresso 5 V</span><span id="s-5" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_pin">Tensione su GPIO1</span><span id="s-pin" class="v">–</span></div>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-out"/></svg><span data-i18n="sec_out"></span></h2></div>
+          <div class="row"><span id="d-out" class="dot"></span><span class="k" data-i18n="k_state">Stato</span><span id="s-out" class="v">–</span></div>
+          <div class="row"><span id="d-dact" class="dot"></span><span class="k" data-i18n="k_selftest">Test di Avvio</span><span id="s-dact" class="v">–</span></div>
+          <div class="row"><span id="d-fault" class="dot"></span><span class="k" data-i18n="k_fault">FAULT</span><span id="s-fault" class="v">–</span></div>
+          <div class="row"><span id="d-ot" class="dot"></span><span class="k" data-i18n="k_overtemp">Sovratemperatura</span><span id="s-ot" class="v">–</span></div>
+          <div class="row"><span id="d-iof" class="dot"></span><span class="k" data-i18n="k_iout_fault">Fault IOUT</span><span id="s-iof" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="rb_ctrl">Registro di Controllo</span><span id="s-ctrl" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_status">Registro di Stato</span><span id="s-sts" class="v">–</span></div>
+          <div class="test-bar"><button id="dac-run" class="btn" type="button" data-i18n="btn_test">ESEGUI TEST SPI</button><span id="dac-res" class="zone" hidden></span></div>
+          <p class="hint" data-i18n="dg_dac_hint"></p>
+          <div class="tbl-wrap"><table id="dac-tab" class="cal-table" hidden><thead><tr><th data-i18n="th_step"></th><th data-i18n="th_exp"></th><th data-i18n="th_read"></th><th></th></tr></thead><tbody></tbody></table></div>
+          <p id="dac-info" class="hint"></p>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-in"/></svg><span data-i18n="sec_in"></span></h2></div>
+          <div class="row"><span id="d-adct" class="dot"></span><span class="k" data-i18n="k_selftest">Test di Avvio</span><span id="s-adct" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_temp">Temperatura</span><span id="s-adctemp" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_conv">Conversioni</span><span id="s-adcn" class="v">–</span></div>
+          <div class="row"><span id="d-adce" class="dot"></span><span class="k" data-i18n="k_errors">Errori</span><span id="s-adce" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_code_v">Codice Tensione</span><span id="s-codev" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_code_i">Codice Corrente</span><span id="s-codei" class="v">–</span></div>
+          <div class="test-bar"><button id="adc-run" class="btn" type="button" data-i18n="btn_test">ESEGUI TEST SPI</button><span id="adc-res" class="zone" hidden></span></div>
+          <p class="hint" data-i18n="dg_adc_hint"></p>
+          <div class="tbl-wrap"><table id="adc-tab" class="cal-table" hidden><thead><tr><th data-i18n="th_step"></th><th data-i18n="th_exp"></th><th data-i18n="th_read"></th><th></th></tr></thead><tbody></tbody></table></div>
+          <p id="adc-info" class="hint"></p>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-chip"/></svg><span data-i18n="sec_esp"></span></h2></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_temp">Temperatura</span><span id="s-esptemp" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_heap">Memoria Libera</span><span id="s-heap" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_heap_min">Memoria Minima</span><span id="s-heapmin" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_uptime">In Funzione da</span><span id="s-up" class="v">–</span></div>
+          <div class="row"><span id="d-rst" class="dot"></span><span class="k" data-i18n="k_reset">Ultimo Riavvio</span><span id="s-rst" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_cpu">Frequenza CPU</span><span id="s-cpu" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_fw">Firmware</span><span id="s-fwv" class="v">–</span></div>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-wifi"/></svg><span data-i18n="dg_wifi">WiFi e Antenna</span></h2></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_network">Rete</span><span id="s-ssid" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_channel">Canale</span><span id="s-ch" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_tx">Potenza TX</span><span id="s-tx" class="v">–</span></div>
+          <div class="tx-set">
+            <label class="k" for="tx-sel" data-i18n="k_tx_set">Imposta Potenza TX</label>
+            <select id="tx-sel" class="select"><option>19.5</option><option>18.5</option><option>17</option><option>15</option><option>13</option><option>11</option><option>8.5</option><option>7</option><option>5</option><option>2</option></select>
+            <span class="unit-s">dBm</span>
+            <button id="tx-apply" class="btn" type="button" data-i18n="btn_apply">APPLICA</button>
+          </div>
+          <span class="label" data-i18n="dg_clients">Dispositivi collegati</span>
+          <div class="tbl-wrap"><table class="cal-table tbl-sta"><thead><tr><th>MAC</th><th>RSSI</th><th data-i18n="th_stats"></th><th data-i18n="th_rate"></th></tr></thead><tbody id="sta"></tbody></table></div>
+          <div class="test-bar"><span class="label" data-i18n="dg_nets">Reti vicine</span><button id="scan" class="btn" type="button" data-i18n="btn_scan">SCANSIONA</button><span id="scan-age" class="hint"></span></div>
+          <div class="tbl-wrap"><table class="cal-table"><thead><tr><th>SSID</th><th data-i18n="th_ch"></th><th>RSSI</th><th></th></tr></thead><tbody id="nets"></tbody></table></div>
+          <p class="hint" data-i18n="dg_wifi_hint"></p>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-pulse"/></svg><span data-i18n="dg_io">LED e Cicalino</span></h2></div>
+          <span class="label" data-i18n="dg_led">LED RGB</span>
+          <div class="btn-row cols-5">
+            <button class="btn sw" type="button" data-rgb="255,0,0"><i style="background:#e11d48"></i><span data-i18n="c_red">Rosso</span></button>
+            <button class="btn sw" type="button" data-rgb="0,255,0"><i style="background:#16a34a"></i><span data-i18n="c_green">Verde</span></button>
+            <button class="btn sw" type="button" data-rgb="0,0,255"><i style="background:#2563eb"></i><span data-i18n="c_blue">Blu</span></button>
+            <button class="btn sw" type="button" data-rgb="255,255,255"><i style="background:#fff"></i><span data-i18n="c_white">Bianco</span></button>
+            <button class="btn sw" type="button" data-rgb="0,0,0"><i style="background:transparent"></i><span data-i18n="c_off">Spento</span></button>
+          </div>
+          <span class="label" data-i18n="dg_buzzer">Cicalino</span>
+          <div class="tx-set">
+            <label class="k" for="bz-f" data-i18n="k_freq">Frequenza</label>
+            <input id="bz-f" class="select" type="number" min="100" max="10000" step="100" value="4000">
+            <span class="unit-s">Hz</span>
+          </div>
+          <div class="btn-row cols-3">
+            <button id="bz-beep" class="btn" type="button" data-i18n="btn_beep">BEEP</button>
+            <button id="bz-sweep" class="btn" type="button" data-i18n="btn_sweep">SWEEP 2–6 kHz</button>
+            <button id="bz-stop" class="btn" type="button" data-i18n="btn_stop_snd">STOP</button>
+          </div>
+          <p id="bz-now" class="hint"></p>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="collaudo.html" data-i18n="fn_bench">Collaudo</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

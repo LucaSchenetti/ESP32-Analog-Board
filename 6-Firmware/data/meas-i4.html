@@ -1,0 +1,195 @@
+<!doctype html>
+<!--
+  IO Tester — Misura corrente 4 fili / Measure 4-wire current
+  IT: Lettura di una corrente 4–20 mA da sorgente attiva (P2.4 mA+ / P2.3 mA−) con barra, zona NAMUR NE 43,
+      HOLD, statistiche, andamento, dettagli tecnici dell'ADS1220, collegamento e informazioni.
+  EN: Reading of a 4–20 mA current from an active source (P2.4 mA+ / P2.3 mA−) with bar, NAMUR NE 43 zone,
+      HOLD, statistics, trend, ADS1220 technical details, wiring and information.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Misura Corrente 4F</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/scale.js" defer></script>
+  <script src="js/alarm.js" defer></script>
+  <script src="js/measure-page.js" defer></script>
+  <script src="js/meas-i4.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-meas">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-pulse"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_meas">Misura</span><span class="sep">·</span><span class="mono">P2.4 mA+ · P2.3 mA−</span></div>
+        <h1 data-i18n="mi4_title">Misura Corrente 4F</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="ms_nosig">NESSUN SEGNALE</span><p data-i18n="mi4_sub">4 – 20 mA · Sorgente Attiva, Ingresso Isolato</p></div>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <!-- IT: Misura / EN: Measurement -->
+      <div class="stack">
+        <section class="card panel p-meas">
+          <h2 data-i18n="ms_title">Misura</h2>
+          <div id="readout" class="readout big off"><span id="now-val" class="num">–</span><span class="unit">mA</span></div>
+          <div id="gauge" class="gauge"><div id="g-fill" class="gauge-fill"></div><i id="g-lo" class="gauge-mark"></i><i id="g-hi" class="gauge-mark"></i></div>
+          <div id="g-ticks" class="gauge-ticks"></div>
+          <div class="meas-meta"><span id="pct">–</span><span id="namur" class="zone"></span></div>
+          <p id="sat-alert" class="alert" role="alert" data-i18n="ms_sat_i" hidden></p>
+          <p id="neg-alert" class="alert warn" role="alert" data-i18n="ms_neg_i4" hidden></p>
+          <div class="actions half">
+            <button id="btn-hold" class="btn btn-lg" type="button">HOLD</button>
+            <button id="btn-reset" class="btn btn-lg" type="button" data-i18n="btn_reset_stats">AZZERA STATISTICHE</button>
+          </div>
+        </section>
+
+        <!-- IT: Scalatura in unità ingegneristiche (scale.js) / EN: Engineering-unit scaling (scale.js) -->
+        <section id="p-scale" class="card panel p-scale"></section>
+
+        <!-- IT: Soglie e allarme acustico (alarm.js) / EN: Thresholds and audible alarm (alarm.js) -->
+        <section id="p-alarm" class="card panel p-alarm"></section>
+
+        <section class="card panel p-stats">
+          <div class="panel-head"><h2 data-i18n="ms_stats">Statistiche</h2><span class="summary-sub" data-i18n="ms_stats_sub">Dall'Apertura della Pagina o dall'Azzeramento</span></div>
+          <div class="stats">
+            <div class="stat"><span class="k" data-i18n="ms_min">Minimo</span><span id="st-min" class="v">–</span></div>
+            <div class="stat"><span class="k" data-i18n="ms_max">Massimo</span><span id="st-max" class="v">–</span></div>
+            <div class="stat"><span class="k" data-i18n="ms_mean">Media</span><span id="st-mean" class="v">–</span></div>
+            <div class="stat"><span class="k" data-i18n="ms_sd">Deviazione Standard</span><span id="st-sd" class="v">–</span></div>
+            <div class="stat"><span class="k" data-i18n="ms_pp">Picco-Picco</span><span id="st-pp" class="v">–</span></div>
+            <div class="stat"><span class="k" data-i18n="ms_n">Campioni · Durata</span><span id="st-n" class="v">–</span></div>
+          </div>
+          <span class="label" data-i18n="ms_trend">Andamento · Ultimi 2 Minuti</span>
+          <div class="trend-box">
+            <svg class="trend" viewBox="0 0 600 160" preserveAspectRatio="none" aria-hidden="true">
+              <g class="grid"><line x1="0" y1="40" x2="600" y2="40"/><line x1="0" y1="80" x2="600" y2="80"/><line x1="0" y1="120" x2="600" y2="120"/></g>
+              <polygon id="tr-area" points=""/>
+              <polyline id="tr-line" points=""/>
+            </svg>
+            <span id="tr-hi" class="trend-y hi"></span>
+            <span id="tr-lo" class="trend-y lo"></span>
+          </div>
+          <div class="trend-x"><span>−2 min</span><span>−1 min</span><span data-i18n="ms_now">ora</span></div>
+        </section>
+
+        <!-- IT: Dettagli tecnici, sempre visibili / EN: Technical details, always visible -->
+        <section class="card panel p-rb">
+          <div class="panel-head"><h2 data-i18n="rb_title">Dettagli Tecnici</h2><span class="summary-sub" data-i18n="ms_rb_sub">Lettura dal Chip ADS1220</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="ms_nom">Valore con Componenti Nominali</span><span id="s-nom" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="ms_win">Rumore Picco-Picco (Ultime 10 Letture)</span><span id="s-win" class="v">–</span></div>
+          <div class="row"><span id="d-code" class="dot"></span><span class="k" data-i18n="ms_code">Codice ADC (24 Bit)</span><span id="s-code" class="v">–</span></div>
+          <div class="row"><span id="d-sat" class="dot"></span><span class="k" data-i18n="ms_satk">Fuori Scala</span><span id="s-sat" class="v">–</span></div>
+          <div class="row"><span id="d-cal" class="dot"></span><span class="k" data-i18n="ms_cal">Calibrazione Ingresso</span><span id="s-cal" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="ms_temp">Temperatura ADS1220</span><span id="s-temp" class="v">–</span></div>
+          <div class="row"><span id="d-conv" class="dot"></span><span class="k" data-i18n="ms_conv">Conversioni / Errori</span><span id="s-conv" class="v">–</span></div>
+          <div class="row"><span id="d-cmp" class="dot"></span><span id="k-cmp" class="k"></span><span id="s-cmp" class="v">–</span></div>
+          <p class="hint" data-i18n="ms_cmp_hint_i4">Solo collegando P1.3 mA+ → P2.4 mA+ e P1.1 COM → P2.3 mA− con "Genera Corrente 4F" attiva</p>
+        </section>
+      </div>
+
+      <!-- IT: Collegamento e informazioni / EN: Wiring and information -->
+      <div class="stack">
+        <section class="card panel p-wr">
+          <h2 data-i18n="wr_title">Collegamento</h2>
+          <svg id="wiring" class="wiring" viewBox="0 0 600 280" role="img" aria-label="Schema di collegamento / Wiring diagram">
+            <!-- IO Tester, P2 INPUT -->
+            <rect class="wr-box" x="8" y="8" width="252" height="264" rx="14"/>
+            <text class="wr-title" x="24" y="36" data-i18n="wr_cal_in">IO Tester · P2 INPUT</text>
+            <rect class="wr-strip" x="200" y="54" width="40" height="210" rx="6"/>
+            <circle class="wr-term" cx="220" cy="76" r="9"/>
+            <circle class="wr-term" cx="220" cy="118" r="9"/>
+            <circle class="wr-term used" cx="220" cy="160" r="9"/>
+            <circle class="wr-term used" cx="220" cy="202" r="9"/>
+            <circle class="wr-term" cx="220" cy="244" r="9"/>
+            <text class="wr-label free" x="190" y="80" text-anchor="end">P2.1 V−</text>
+            <text class="wr-label free" x="190" y="122" text-anchor="end">P2.2 V+</text>
+            <text class="wr-label" x="190" y="164" text-anchor="end">P2.3 mA−</text>
+            <text class="wr-label pos" x="190" y="206" text-anchor="end">P2.4 mA+</text>
+            <text class="wr-label free" x="190" y="248" text-anchor="end">P2.5 L+</text>
+            <line class="wr-stub" x1="229" y1="76" x2="250" y2="76"/>
+            <line class="wr-stub" x1="229" y1="118" x2="250" y2="118"/>
+            <line class="wr-stub" x1="229" y1="244" x2="250" y2="244"/>
+            <text class="wr-free" x="256" y="80" data-i18n="wr_free">libero</text>
+            <text class="wr-free" x="256" y="122" data-i18n="wr_free">libero</text>
+            <text class="wr-free" x="256" y="248" data-i18n="wr_free">libero</text>
+
+            <!-- PLC / dispositivo / device -->
+            <rect class="wr-box" x="380" y="60" width="210" height="160" rx="14"/>
+            <text class="wr-title" x="410" y="92" data-i18n="wr_plc_out">Uscita Analogica</text>
+            <text class="wr-sub" x="410" y="112" data-i18n="wr_plc_sub_mi4">PLC · 4–20 mA attiva</text>
+            <rect class="wr-strip" x="366" y="122" width="28" height="86" rx="5"/>
+            <circle class="wr-term used" cx="380" cy="142" r="8"/>
+            <circle class="wr-term used" cx="380" cy="188" r="8"/>
+            <text class="wr-label" x="410" y="146">M_ANA / −</text>
+            <text class="wr-label pos" x="410" y="192">QI / +</text>
+
+            <!-- Fili / Wires -->
+            <polyline class="wr-com" points="229,160 340,160 340,142 371,142"/>
+            <polyline class="wr-pos" points="229,202 320,202 320,188 371,188"/>
+            <!-- IT: Flusso animato quando c'è segnale / EN: Animated flow while a signal is present -->
+            <polyline class="wr-flow" points="371,188 320,188 320,202 229,202"/>
+            <polyline class="wr-flow com" points="229,160 340,160 340,142 371,142"/>
+          </svg>
+          <p class="hint" data-i18n="wr_note_mi4"></p>
+        </section>
+
+        <section class="card panel p-info">
+          <h2 data-i18n="in_title">Informazioni sulla Misura</h2>
+          <dl class="info">
+            <div><dt data-i18n="i_range_k">Campo</dt><dd data-i18n="i_range_mi"></dd></div>
+            <div><dt data-i18n="i_res_k">Risoluzione</dt><dd data-i18n="i_res_mi"></dd></div>
+            <div><dt data-i18n="i_acc_k">Precisione</dt><dd data-i18n="i_acc_mi"></dd></div>
+            <div><dt data-i18n="i_burden_k">Caduta di Tensione</dt><dd data-i18n="i_burden_mi4"></dd></div>
+            <div><dt data-i18n="i_rej_k">Reiezione 50/60 Hz</dt><dd data-i18n="i_rej_m"></dd></div>
+            <div><dt data-i18n="i_upd_k">Aggiornamento</dt><dd data-i18n="i_upd_m"></dd></div>
+            <div><dt data-i18n="i_iso_k">Isolamento</dt><dd data-i18n="i_iso_mi"></dd></div>
+            <div><dt data-i18n="i_safe_k">Sicurezza</dt><dd data-i18n="i_safe_mi4"></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

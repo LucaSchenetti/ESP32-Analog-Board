@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IT: testi in italiano. -->
+<resources>
+    <string name="app_name">IO Tester</string>
+    <string name="subtitle">Calibratore I/O analogici</string>
+    <string name="connecting">Collegamento alla rete IO-Tester…</string>
+    <string name="connecting_hint">Accendere lo strumento e confermare il collegamento quando Android lo chiede.</string>
+    <string name="loading">Apertura dell\'interfaccia…</string>
+    <string name="not_found">Strumento non trovato</string>
+    <string name="not_found_hint">Controllare che lo strumento sia acceso e vicino, poi riprovare.</string>
+    <string name="lost">Collegamento perso</string>
+    <string name="lost_hint">Le uscite si spengono da sole quando il telefono lascia il WiFi.</string>
+    <string name="old_android">Collegare il telefono alla rete WiFi IO-Tester (password calibra123), poi toccare Riprova.</string>
+    <string name="searching">Ricerca dello strumento…</string>
+    <string name="searching_hint">Accendere lo strumento: il collegamento parte da solo. Quando Android lo chiede, toccare Connetti.</string>
+    <string name="retry">RIPROVA</string>
+    <string name="wifi_settings">IMPOSTAZIONI WIFI</string>
+</resources>

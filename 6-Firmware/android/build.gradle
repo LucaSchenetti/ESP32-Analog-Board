@@ -1,0 +1,4 @@
+// IT: Plugin Android (nessuna libreria esterna nell'app). EN: Android plugin (no external libraries in the app).
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
+}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- IT: Logo IO Tester: quadrante di misura con lancetta. EN: IO Tester logo: measuring dial with needle. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <path d="M14 42 A18 18 0 1 1 50 42" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
+  <path d="M14 42 A18 18 0 0 1 43.5 27" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <g stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-opacity="0.8">
+    <line x1="32" y1="17" x2="32" y2="21"/>
+    <line x1="19.3" y1="22.3" x2="22.1" y2="25.1"/>
+    <line x1="44.7" y1="22.3" x2="41.9" y2="25.1"/>
+  </g>
+  <line x1="32" y1="40" x2="42" y2="28" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="32" cy="40" r="4.5" fill="#fff"/>
+  <rect x="22" y="49" width="20" height="5" rx="2.5" fill="#fff" fill-opacity="0.9"/>
+</svg>

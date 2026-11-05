@@ -1,0 +1,18 @@
+// IT: Progetto Android "IO Tester": contenitore WebView dell'interfaccia dello strumento.
+// EN: "IO Tester" Android project: WebView container for the instrument interface.
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "IOTester"
+include ':app'

@@ -1,0 +1,144 @@
+<!doctype html>
+<!--
+  IO Tester — Simulatore di Processo / Process Simulator
+  IT: Prova del PID del PLC "hardware in the loop", pensata per il telefono: valori e grafico sempre visibili in
+      alto, schede Disturbi / Processo / Collega / PID sotto, barra AVVIA/FERMA fissa in basso, avvio con conferma.
+  EN: "Hardware in the loop" test of the PLC PID, designed for phones: values and chart always visible on top,
+      Disturbances / Process / Wiring / PID tabs below, START/STOP bar fixed at the bottom, start with confirmation.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Simulatore di Processo</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/pid.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-test pd-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-pid"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_test">Prove</span><span class="sep">·</span><span class="mono">PLC ⇄ IO Tester</span></div>
+        <h1 data-i18n="pd_title">Simulatore di Processo</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="pd_st_stop">FERMO</span><p id="pd-head-sub" data-i18n="pd_sub">Prova il PID del PLC su un Processo Simulato</p></div>
+      </div>
+    </div>
+
+    <div class="pd-layout">
+      <!-- IT: Valori e grafico, sempre visibili / EN: Values and chart, always visible -->
+      <section id="p-live" class="card pd-live">
+        <div class="pd-hero">
+          <div class="pd-pv">
+            <span class="pd-k"><i class="sw pv"></i><span data-i18n="pd_v_pv">Sensore (PV)</span></span>
+            <div class="pd-big"><span id="pd-pv" class="num">–</span><span class="unit">%</span></div>
+            <span id="pd-pv-s" class="pd-sig">&nbsp;</span>
+          </div>
+          <div class="pd-side">
+            <div class="pd-mini">
+              <span class="pd-k"><i class="sw mv"></i><span data-i18n="pd_v_mv">Uscita PLC (MV)</span></span>
+              <div class="pd-mrow"><span id="pd-mv" class="num">–</span><small>%</small></div>
+              <div class="pd-bar-s"><i id="pd-mv-b"></i></div>
+              <span id="pd-mv-s" class="pd-sig">&nbsp;</span>
+            </div>
+            <div class="pd-mini">
+              <span class="pd-k"><i class="sw vl"></i><span data-i18n="pd_v_valve">Valvola</span></span>
+              <div class="pd-mrow"><span id="pd-vl" class="num">–</span><small>%</small></div>
+              <div class="pd-bar-s vl"><i id="pd-vl-b"></i></div>
+            </div>
+          </div>
+        </div>
+        <p id="pd-mvbad" class="alert warn" data-i18n="pd_mvbad" hidden></p>
+        <p id="pd-faulton" class="alert warn" hidden></p>
+        <p id="pd-dacfault" class="alert" role="alert" data-i18n="pd_dacfault" hidden></p>
+        <div class="pd-chart-box">
+          <svg id="pd-trend" class="pd-svg" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+          <span class="pd-y y100">100</span><span class="pd-y y50">50</span><span class="pd-y y0">0 %</span>
+          <span id="pd-idle" class="pd-idle" data-i18n="pd_idle">Premi AVVIA: qui vedrai uscita del PLC, valvola e sensore</span>
+        </div>
+        <div class="pd-legend"><span class="lg pdmv" data-i18n="pd_lg_mv">Uscita PLC</span><span class="lg pdvl" data-i18n="pd_lg_vl">Valvola</span><span class="lg pdpv" data-i18n="pd_lg_pv">Sensore</span><span id="pd-time" class="pd-time">−2 min</span></div>
+
+        <!-- IT: Barra delle azioni (fissa in basso sul telefono) / EN: Action bar (fixed at the bottom on phones) -->
+        <div class="pd-actions">
+          <div class="pd-act-info"><span id="pd-act-t" class="pd-act-t"></span><span id="pd-act-s" class="pd-act-s"></span></div>
+          <button id="pd-reset" class="pd-ico-btn" type="button" data-i18n-title="pd_reset"><svg class="icon"><use href="img/icons.svg#ic-reset"/></svg></button>
+          <button id="pd-go" class="btn btn-lg btn-primary pd-go" type="button"><svg class="icon"><use href="img/icons.svg#ic-play"/></svg><span data-i18n="pd_go_s">AVVIA</span></button>
+          <button id="pd-stop" class="btn btn-lg btn-danger pd-go" type="button" hidden><svg class="icon"><use href="img/icons.svg#ic-stop"/></svg><span data-i18n="pd_stop_s">FERMA</span></button>
+        </div>
+      </section>
+
+      <!-- IT: Schede / EN: Tabs -->
+      <div class="pd-right">
+        <nav class="pd-tabs" role="tablist">
+          <button type="button" role="tab" data-tab="dist"><svg class="icon"><use href="img/icons.svg#ic-wave"/></svg><span data-i18n="pd_tab_dist">Disturbi</span></button>
+          <button type="button" role="tab" data-tab="proc"><svg class="icon"><use href="img/icons.svg#ic-sliders"/></svg><span data-i18n="pd_tab_proc">Processo</span></button>
+          <button type="button" role="tab" data-tab="wire"><svg class="icon"><use href="img/icons.svg#ic-link"/></svg><span data-i18n="pd_tab_wire">Collega</span></button>
+          <button type="button" role="tab" data-tab="pid"><svg class="icon"><use href="img/icons.svg#ic-pid"/></svg><span data-i18n="pd_tab_pid">PID</span></button>
+        </nav>
+
+        <section id="tab-dist" class="card panel pd-tab" role="tabpanel"><div id="pd-dist"></div></section>
+        <section id="tab-proc" class="card panel pd-tab" role="tabpanel" hidden><div id="pd-proc"></div></section>
+        <section id="tab-wire" class="card panel pd-tab" role="tabpanel" hidden>
+          <div id="pd-sig"></div>
+          <svg id="wiring" class="wiring" viewBox="0 0 540 305" role="img" aria-label="Schema di collegamento / Wiring diagram"></svg>
+          <ol id="wire-list" class="wire-list"></ol>
+          <p id="wr-note" class="hint"></p>
+        </section>
+        <section id="tab-pid" class="card panel pd-tab" role="tabpanel" hidden>
+          <div class="panel-head"><h2 data-i18n="pd_pid_t">PID Suggerito</h2><span class="summary-sub" data-i18n="pd_pid_sub">Punto di Partenza per PID_Compact</span></div>
+          <div id="pd-pid"></div>
+          <h2 class="pd-h2" data-i18n="pd_info">Come Usarlo con TIA Portal</h2>
+          <dl class="info">
+            <div><dt data-i18n="pd_i1_k"></dt><dd data-i18n="pd_i1"></dd></div>
+            <div><dt data-i18n="pd_i2_k"></dt><dd data-i18n="pd_i2"></dd></div>
+            <div><dt data-i18n="pd_i3_k"></dt><dd data-i18n="pd_i3"></dd></div>
+            <div><dt data-i18n="pd_i4_k"></dt><dd data-i18n="pd_i4"></dd></div>
+            <div><dt data-i18n="pd_i5_k"></dt><dd data-i18n="pd_i5"></dd></div>
+            <div><dt data-i18n="pd_i6_k"></dt><dd data-i18n="pd_i6"></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+    <footer class="footer pd-footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# ESP32-S3FN8 — 8 MB flash (0x800000)
+# Due slot applicazione per l'aggiornamento OTA (rev.20).
+# nvs e otadata restano agli stessi indirizzi della tabella precedente: la calibrazione in NVS si conserva.
+# Name,     Type, SubType,  Offset,    Size,      Flags
+nvs,        data, nvs,      0x9000,    0x5000,
+otadata,    data, ota,      0xe000,    0x2000,
+app0,       app,  ota_0,    0x10000,   0x340000,
+app1,       app,  ota_1,    0x350000,  0x340000,
+spiffs,     data, spiffs,   0x690000,  0x160000,
+coredump,   data, coredump, 0x7F0000,  0x10000,

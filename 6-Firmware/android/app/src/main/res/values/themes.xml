@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- IT: Tema chiaro senza barra del titolo, colori dell'interfaccia. EN: Light theme without title bar, interface colours. -->
+<resources>
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <color name="bg">#F3F5F9</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text">#0F1B2D</color>
+    <color name="muted">#64748B</color>
+    <color name="accent">#2563EB</color>
+    <color name="err">#DC2626</color>
+</resources>

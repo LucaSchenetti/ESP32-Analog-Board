@@ -1,0 +1,182 @@
+<!doctype html>
+<!--
+  IO Tester — Collaudo / Bench test
+  IT: Pagina tecnica per il collaudo al banco: uscite AD5412 e sink SENZA calibrazione con rilettura dei registri,
+      ingressi ADS1220 con valori nominali e codici grezzi, alimentazione grezza, prova di LED e cicalino.
+      Sostituisce la pagina interna al firmware (che resta come riserva se manca l'interfaccia).
+  EN: Technical page for bench testing: AD5412 outputs and sink WITHOUT calibration with register read-back,
+      ADS1220 inputs with nominal values and raw codes, raw supply, LED and buzzer test.
+      Replaces the built-in firmware page (kept as a fallback when the interface is missing).
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Collaudo</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/collaudo.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-tool bench-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-tool"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_tool">Strumento</span><span class="sep">·</span><span class="mono">P1 · P2</span></div>
+        <h1 data-i18n="bt_title">Collaudo</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="bt_st_off">USCITE SPENTE</span><p data-i18n="bt_sub">Banco di Prova Tecnico</p></div>
+      </div>
+    </div>
+
+    <p class="alert warn bt-warn" data-i18n="bt_warn">Pagina tecnica: le uscite qui non usano la calibrazione. Per l'uso normale scegliere le pagine Genera.</p>
+
+    <div class="page-grid">
+      <div class="stack">
+        <!-- IT: Uscite senza calibrazione / EN: Outputs without calibration -->
+        <section id="p-out" class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-out"/></svg><span data-i18n="bt_out">Uscite Senza Calibrazione</span></h2></div>
+          <div class="seg seg-wide" role="group">
+            <button type="button" data-mode="v" aria-pressed="true">0–10 V</button>
+            <button type="button" data-mode="i" aria-pressed="false">4–20 mA</button>
+            <button type="button" data-mode="s" aria-pressed="false">2F</button>
+          </div>
+          <p id="mode-hint" class="hint mono"></p>
+          <div id="bt-field" class="field">
+            <input id="bt-val" type="text" inputmode="decimal" autocomplete="off">
+            <span id="bt-unit" class="unit">V</span>
+          </div>
+          <div id="bt-err" class="err-text"></div>
+          <div id="bt-quick" class="btn-row cols-5"></div>
+          <div class="actions">
+            <button id="bt-set" class="btn btn-lg btn-primary" type="button" data-i18n="bt_set">IMPOSTA</button>
+            <button id="bt-off" class="btn btn-lg btn-danger" type="button" data-i18n="btn_stop">SPEGNI</button>
+          </div>
+          <span class="label" data-i18n="bt_rb">Rilettura AD5412</span>
+          <div class="row"><span id="d-mode" class="dot"></span><span class="k" data-i18n="bt_k_mode">Modo</span><span id="s-mode" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="bt_k_theory">Valore Teorico</span><span id="s-theory" class="v">–</span></div>
+          <div class="row"><span id="d-code" class="dot"></span><span class="k" data-i18n="rb_code">Codice DAC Scritto / Riletto</span><span id="s-code" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="rb_ctrl">Registro di Controllo</span><span id="s-ctrl" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_status">Registro di Stato</span><span id="s-sts" class="v">–</span></div>
+          <div class="row"><span id="d-fault" class="dot"></span><span class="k" data-i18n="k_fault">FAULT</span><span id="s-fault" class="v">–</span></div>
+          <p class="hint" data-i18n="bt_out_hint"></p>
+        </section>
+
+        <!-- IT: Ingressi grezzi / EN: Raw inputs -->
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-in"/></svg><span data-i18n="bt_in">Ingressi ADS1220</span></h2></div>
+          <div class="bt-in">
+            <div class="stat"><span class="k" data-i18n="bt_v_nom">Tensione Nominale</span><span id="st-vn" class="v">–</span><span id="st-vc" class="sub">–</span></div>
+            <div class="stat"><span class="k" data-i18n="bt_i_nom">Corrente Nominale</span><span id="st-in" class="v">–</span><span id="st-ic" class="sub">–</span></div>
+          </div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="bt_k_vrng">Tensione Min … Max</span><span id="s-vrng" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="bt_k_irng">Corrente Min … Max</span><span id="s-irng" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_code_v">Codice Tensione</span><span id="s-cv" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_code_i">Codice Corrente</span><span id="s-ci" class="v">–</span></div>
+          <div class="row"><span id="d-flags" class="dot"></span><span class="k" data-i18n="bt_k_flags">Fuori Scala / Negativa</span><span id="s-flags" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_temp">Temperatura</span><span id="s-atemp" class="v">–</span></div>
+          <div class="row"><span id="d-conv" class="dot"></span><span class="k" data-i18n="ms_conv">Conversioni / Errori</span><span id="s-conv" class="v">–</span></div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <!-- IT: Alimentazione grezza / EN: Raw supply -->
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-power"/></svg><span data-i18n="sec_supply">Alimentazione</span></h2></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_vusb">Tensione USB</span><span id="s-vusb" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="k_pin">Tensione su GPIO1</span><span id="s-pin" class="v">–</span></div>
+          <div class="row"><span class="dot"></span><span class="k" data-i18n="bt_k_att">Attenuazione ADC (GPIO1)</span><span id="s-att" class="v">–</span></div>
+          <div class="row"><span id="d-g17" class="dot"></span><span class="k" data-i18n="bt_k_g17">GPIO17 · Presenza 24 V</span><span id="s-g17" class="v">–</span></div>
+          <div class="row"><span id="d-g18" class="dot"></span><span class="k" data-i18n="bt_k_g18">GPIO18 · Presenza 5 V</span><span id="s-g18" class="v">–</span></div>
+        </section>
+
+        <!-- IT: LED / EN: LEDs -->
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-sun"/></svg><span data-i18n="bt_led">LED</span></h2></div>
+          <div class="rgb">
+            <div id="rgb-swatch" class="rgb-swatch"></div>
+            <div class="rgb-sliders">
+              <label class="sl r"><span>R</span><input id="lr" type="range" min="0" max="255" value="0"><b id="lr-v">0</b></label>
+              <label class="sl g"><span>G</span><input id="lg" type="range" min="0" max="255" value="40"><b id="lg-v">40</b></label>
+              <label class="sl b"><span>B</span><input id="lb" type="range" min="0" max="255" value="0"><b id="lb-v">0</b></label>
+            </div>
+          </div>
+          <div class="btn-row cols-2">
+            <button id="rgb-apply" class="btn" type="button" data-i18n="bt_rgb_apply">MOSTRA PER 60 s</button>
+            <button id="rgb-auto" class="btn" type="button" data-i18n="bt_rgb_auto">TORNA AUTOMATICO</button>
+          </div>
+          <span class="label" data-i18n="bt_led_test">LED di test blu (GPIO36)</span>
+          <div class="btn-row cols-2">
+            <button class="btn" type="button" data-test="1" data-i18n="bt_on">ACCESO</button>
+            <button class="btn" type="button" data-test="0" data-i18n="bt_off">SPENTO</button>
+          </div>
+        </section>
+
+        <!-- IT: Cicalino / EN: Buzzer -->
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-pulse"/></svg><span data-i18n="dg_buzzer">Cicalino</span></h2></div>
+          <div class="tx-set">
+            <label class="k" for="bz-f" data-i18n="k_freq">Frequenza</label>
+            <input id="bz-f" class="select" type="number" min="100" max="10000" step="100" value="4000"><span class="unit-s">Hz</span>
+          </div>
+          <div class="tx-set">
+            <label class="k" for="bz-ms" data-i18n="bt_dur">Durata</label>
+            <input id="bz-ms" class="select" type="number" min="10" max="5000" step="10" value="300"><span class="unit-s">ms</span>
+          </div>
+          <div class="btn-row cols-2">
+            <button id="bz-beep" class="btn" type="button" data-i18n="btn_beep">BEEP</button>
+            <button id="bz-cont" class="btn" type="button" data-i18n="bt_cont">CONTINUO</button>
+            <button id="bz-sweep" class="btn" type="button" data-i18n="btn_sweep">SWEEP 2–6 kHz</button>
+            <button id="bz-stop" class="btn" type="button" data-i18n="btn_stop_snd">STOP</button>
+          </div>
+          <p id="bz-now" class="hint"></p>
+        </section>
+
+        <section class="card panel">
+          <div class="panel-head"><h2><svg class="icon"><use href="img/icons.svg#ic-chip"/></svg><span data-i18n="bt_more">Test SPI e Antenna</span></h2></div>
+          <p class="hint" data-i18n="bt_more_txt"></p>
+          <div class="actions single"><a class="btn btn-lg bt-link" href="diag.html" data-i18n="bt_more_btn">APRI DIAGNOSTICA</a></div>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

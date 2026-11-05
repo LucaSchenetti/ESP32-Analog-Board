@@ -1,0 +1,134 @@
+<!doctype html>
+<!--
+  IO Tester — pagina principale / home page
+  IT: Misure in tempo reale, scelta della funzione e stato di tutto il sistema (alimentazione, AD5412,
+      ADS1220, ESP32-S3, WiFi, calibrazione). Testi IT/EN (js/i18n.js), tema chiaro/scuro (js/theme.js).
+  EN: Live readings, function selection and full system status (supply, AD5412, ADS1220, ESP32-S3,
+      WiFi, calibration). IT/EN texts (js/i18n.js), light/dark theme (js/theme.js).
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="img/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/home.js" defer></script>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content home">
+    <!-- IT: Uscita attiva + spegnimento / EN: Active output + switch-off -->
+    <section id="banner" class="banner" hidden>
+      <div class="text">
+        <strong id="banner-text">-</strong>
+        <span id="banner-fault" class="fault" data-i18n="out_fault" hidden></span>
+      </div>
+      <button id="btn-off" class="btn-stop" type="button">
+        <svg class="icon"><use href="img/icons.svg#ic-stop"/></svg><span data-i18n="btn_off">SPEGNI USCITE</span>
+      </button>
+    </section>
+
+    <!-- IT: Stato dello strumento / EN: Instrument state -->
+    <section class="card hero">
+      <div class="hero-main">
+        <span id="hero-ico" class="hero-ico"><svg class="icon"><use href="img/icons.svg#ic-chip"/></svg></span>
+        <div class="hero-text">
+          <h1 id="hero-title" data-i18n="conn_wait">Connessione…</h1>
+          <p id="hero-sub"></p>
+        </div>
+        <a class="btn hero-btn" href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+      </div>
+      <div class="hero-chips">
+        <div class="hchip"><span class="k" data-i18n="hm_c_power">Alimentazione</span><span class="v"><span id="d-hpow" class="dot"></span><span id="s-hpow">–</span></span><span id="hpow-sub" class="hsub">&nbsp;</span></div>
+        <div class="hchip"><span class="k" data-i18n="hm_c_out">Uscite</span><span class="v"><span id="d-hout" class="dot"></span><span id="s-hout">–</span></span></div>
+        <div class="hchip"><span class="k" data-i18n="hm_c_cal">Calibrazione</span><span class="v"><span id="d-hcal" class="dot"></span><span id="s-hcal">–</span></span></div>
+        <div class="hchip"><span class="k" data-i18n="hm_c_wifi">WiFi</span><span class="v"><span id="d-hwifi" class="dot"></span><span id="s-hwifi">–</span></span></div>
+      </div>
+    </section>
+
+    <!-- IT: Ingressi in tempo reale / EN: Live inputs -->
+    <div class="section-title cat-meas"><span class="bar"></span><h2 data-i18n="hm_inputs">Ingressi</h2></div>
+    <section class="live2">
+      <a class="card reading cat-meas" href="meas-v.html">
+        <div class="top"><span class="label" data-i18n="in_voltage">Ingresso Tensione</span><span class="tag">P2.2 V+ / P2.1 V−</span></div>
+        <div class="value"><span id="v-in" class="num">–</span><span class="unit">V</span></div>
+        <div class="sub"><span id="v-range">&nbsp;</span> <span id="v-flag" class="flag" hidden></span></div>
+        <div class="links"><span class="open" data-i18n="hm_open">Apri la misura</span></div>
+      </a>
+      <div class="card reading cat-meas">
+        <div class="top"><span class="label" data-i18n="in_current">Ingresso Corrente</span><span class="tag">P2.4 mA+ / P2.3 mA−</span></div>
+        <div class="value"><span id="i-in" class="num">–</span><span class="unit">mA</span><span id="i-zone" class="zone" hidden></span></div>
+        <div class="sub"><span id="i-range">&nbsp;</span> <span id="i-flag" class="flag" hidden></span></div>
+        <div class="links"><a class="open" href="meas-i4.html" data-i18n="fn_cur_4w">Corrente 4F</a><a class="open" href="meas-i2.html" data-i18n="fn_cur_2w">Corrente 2F</a></div>
+      </div>
+    </section>
+
+    <!-- IT: Funzioni / EN: Functions -->
+    <div class="section-title"><span class="bar"></span><h2 data-i18n="hm_fn">Funzioni</h2></div>
+    <section class="fn-cols">
+      <div class="card fn-col cat-gen">
+        <h3 data-i18n="grp_gen">Genera</h3>
+        <a class="fn-item" href="gen-v.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-volt"/></svg></span><span><b data-i18n="fn_voltage">Tensione</b><small>0 – 10 V · P1.4 V+</small></span><span class="chev">›</span></a>
+        <a class="fn-item" href="gen-i.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-amp"/></svg></span><span><b data-i18n="fn_current">Corrente 4F</b><small>4 – 20 mA · P1.3 mA+</small></span><span class="chev">›</span></a>
+        <a class="fn-item cat-loop" href="sim.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-loop"/></svg></span><span><b data-i18n="fn_sim">Corrente 2F</b><small data-i18n="hm_sim_sub">2 fili · P1.2 SIM+</small></span><span class="chev">›</span></a>
+      </div>
+      <div class="card fn-col cat-meas">
+        <h3 data-i18n="grp_meas">Misura</h3>
+        <a class="fn-item" href="meas-v.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-gauge"/></svg></span><span><b data-i18n="fn_voltage">Tensione</b><small>0 – 10 V · P2.2 V+</small></span><span class="chev">›</span></a>
+        <a class="fn-item" href="meas-i4.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-pulse"/></svg></span><span><b data-i18n="fn_cur_4w">Corrente 4F</b><small data-i18n="hm_i4_sub">Sorgente attiva · P2.4 mA+</small></span><span class="chev">›</span></a>
+        <a class="fn-item" href="meas-i2.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-plug"/></svg></span><span><b data-i18n="fn_cur_2w">Corrente 2F</b><small data-i18n="hm_i2_sub">Alimentato da P2.5 L+</small></span><span class="chev">›</span></a>
+      </div>
+      <div class="card fn-col cat-tool">
+        <h3 data-i18n="grp_tool">Strumento</h3>
+        <a class="fn-item cat-test" href="prove.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-steps"/></svg></span><span><b data-i18n="fn_tests">Prove Guidate</b><small data-i18n="hm_pg_sub">Convertitori, isolatori, valvole</small></span><span class="chev">›</span></a>
+        <a class="fn-item cat-test" href="pid.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-pid"/></svg></span><span><b data-i18n="fn_pid">Simulatore di Processo</b><small data-i18n="hm_pd_sub">Prova il PID del PLC</small></span><span class="chev">›</span></a>
+        <a class="fn-item" href="cal.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-target"/></svg></span><span><b data-i18n="fn_cal">Calibrazione</b><small id="fn-cal-sub">–</small></span><span class="chev">›</span></a>
+        <a class="fn-item" href="autotest.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-check"/></svg></span><span><b data-i18n="fn_autotest">Autotest</b><small data-i18n="hm_at_sub">Verifica dello strumento in 1 minuto</small></span><span class="chev">›</span></a>
+        <a class="fn-item" href="diag.html"><span class="ico"><svg class="icon"><use href="img/icons.svg#ic-chip"/></svg></span><span><b data-i18n="fn_diag">Diagnostica</b><small data-i18n="hm_diag_sub">Componenti, test, antenna</small></span><span class="chev">›</span></a>
+      </div>
+    </section>
+
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>

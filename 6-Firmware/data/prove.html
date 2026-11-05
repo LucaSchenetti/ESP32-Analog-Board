@@ -1,0 +1,142 @@
+<!doctype html>
+<!--
+  IO Tester — Prove Guidate / Guided Tests
+  IT: Prove "genera, misura e confronta": convertitore / isolatore / barriera e valvola / posizionatore, con
+      configurazione, disegno dei collegamenti, esecuzione automatica, risultati, grafico e copia dei dati.
+  EN: "Generate, measure and compare" tests: converter / isolator / barrier and valve / positioner, with
+      configuration, wiring diagram, automatic run, results, chart and data copy.
+-->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f5f9">
+  <title>IO Tester · Prove Guidate</title>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/common.js" defer></script>
+  <script src="js/prove.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <button id="btn-menu" class="icon-btn menu-btn" type="button" data-i18n-title="nav_menu" aria-controls="sidenav" aria-expanded="false">
+        <svg class="icon"><use href="img/icons.svg#ic-menu"/></svg>
+      </button>
+      <a class="brand" href="/">
+        <img class="logo" src="img/icon.svg" alt="">
+        <div>
+          <div class="brand-name">IO Tester</div>
+          <span class="brand-sub" data-i18n="brand_sub">Calibratore I/O analogici</span>
+        </div>
+      </a>
+      <span class="pill"><span id="conn-dot" class="dot"></span><span id="conn-text" class="conn-text" data-i18n="conn_wait">Connessione…</span></span>
+      <div class="seg" role="group" aria-label="Lingua / Language">
+        <button type="button" data-lang="it" aria-pressed="true">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <button id="btn-theme" class="icon-btn" type="button" data-i18n-title="theme">
+        <svg class="icon theme-light-only"><use href="img/icons.svg#ic-moon"/></svg>
+        <svg class="icon theme-dark-only"><use href="img/icons.svg#ic-sun"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <nav id="sidenav" class="sidenav" aria-label="Menu"></nav>
+  <main class="content cat-test pg-page">
+    <div class="page-head">
+      <span class="head-ico"><svg class="icon"><use href="img/icons.svg#ic-steps"/></svg></span>
+      <div class="head-text">
+        <div class="head-over"><span data-i18n="grp_test">Prove</span><span class="sep">·</span><span class="mono">P1 → ⧉ → P2</span></div>
+        <h1 data-i18n="pg_title">Prove Guidate</h1>
+        <div class="head-sub"><span id="state" class="state-chip" data-i18n="cal_st_idle">PRONTA</span><p data-i18n="pg_sub">Genera, Misura e Confronta</p></div>
+      </div>
+    </div>
+
+    <div class="page-grid">
+      <div class="stack">
+        <!-- IT: Tipo di prova e configurazione / EN: Test type and configuration -->
+        <section class="card panel p-set">
+          <div class="panel-head"><h2 data-i18n="pg_type">Tipo di Prova</h2></div>
+          <div class="seg seg-wide pg-modes" role="group">
+            <button type="button" data-mode="conv" aria-pressed="true"><span data-i18n="pg_m_conv">Convertitore / Isolatore</span></button>
+            <button type="button" data-mode="valve" aria-pressed="false"><span data-i18n="pg_m_valve">Valvola / Posizionatore</span></button>
+          </div>
+          <div id="pg-cfg"></div>
+          <label class="check-opt"><input id="pg-chk" type="checkbox"> <span data-i18n="pg_chk">Ho collegato i fili come nel disegno e alimentato il dispositivo</span></label>
+          <div class="actions single"><button id="pg-go" class="btn btn-lg btn-primary" type="button" disabled>AVVIA</button></div>
+          <div class="actions single"><button id="pg-db" class="btn btn-lg" type="button" data-i18n="pg_go_db" hidden>MISURA BANDA MORTA</button></div>
+          <div id="pg-prog" class="at-prog" hidden>
+            <div class="progress"><div id="pg-bar" class="progress-fill"></div></div>
+            <p id="pg-step" class="run-step"></p>
+            <p id="pg-live" class="pg-live" hidden></p>
+            <div class="actions single"><button id="pg-stop" class="btn btn-lg btn-danger" type="button" data-i18n="btn_abort">INTERROMPI</button></div>
+          </div>
+        </section>
+
+        <!-- IT: Risultati / EN: Results -->
+        <section class="card panel p-rb">
+          <div class="panel-head"><h2 data-i18n="pg_res">Risultati</h2></div>
+          <div id="pg-sum" class="at-sum" hidden>
+            <div class="at-sum-ico"><svg class="icon"><use href="img/icons.svg#ic-check"/></svg></div>
+            <div><div id="pg-sum-t" class="at-sum-t"></div><div id="pg-sum-d" class="at-sum-d pg-sum-d"></div><div id="pg-sum-e" class="at-sum-e" hidden></div></div>
+          </div>
+          <div id="pg-trend-box" class="pg-chart" hidden>
+            <span class="label" data-i18n="pg_trend">Comando e posizione</span>
+            <svg id="pg-trend" class="pg-svg" viewBox="0 0 600 160" preserveAspectRatio="none"></svg>
+            <div class="pg-legend"><span class="lg cmd" data-i18n="pg_lg_cmd">Comando</span><span class="lg pos" data-i18n="pg_lg_pos">Posizione</span></div>
+          </div>
+          <div id="pg-chart-box" class="pg-chart" hidden>
+            <span class="label" data-i18n="pg_chart">Errore per punto</span>
+            <svg id="pg-chart" class="pg-svg" viewBox="0 0 600 180"></svg>
+            <div class="pg-legend"><span class="lg up" data-i18n="pg_lg_up">Salita</span><span class="lg dn" data-i18n="pg_lg_dn">Discesa</span><span class="lg band" data-i18n="pg_lg_tol">Tolleranza</span></div>
+          </div>
+          <div class="tbl-wrap"><table id="pg-table" class="cal-table at-table pg-table" hidden>
+            <thead><tr id="pg-head"></tr></thead><tbody id="pg-rows"></tbody>
+          </table></div>
+          <div class="actions single"><button id="pg-copy" class="btn" type="button" data-i18n="pg_copy" hidden>COPIA RISULTATI</button></div>
+          <textarea id="pg-txt" class="json-box" rows="6" readonly hidden></textarea>
+          <p id="pg-copy-msg" class="hint"></p>
+          <p class="hint" data-i18n="pg_res_empty"></p>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card panel p-wr">
+          <div class="panel-head"><h2 data-i18n="wr_title">Collegamento</h2></div>
+          <svg id="wiring" class="wiring" viewBox="0 0 528 230" role="img" aria-label="Schema di collegamento / Wiring diagram"></svg>
+          <ol id="wire-list" class="wire-list"></ol>
+          <p id="wr-note" class="hint"></p>
+        </section>
+
+        <section class="card panel p-info">
+          <h2 data-i18n="pg_info">Come Funziona</h2>
+          <dl id="pg-info-conv" class="info">
+            <div><dt data-i18n="pg_i_what_k">Prova</dt><dd data-i18n="pg_i_conv_what"></dd></div>
+            <div><dt data-i18n="pg_i_err_k">Errore</dt><dd data-i18n="pg_i_conv_err"></dd></div>
+            <div><dt data-i18n="pg_i_iso_k">Isolamento</dt><dd data-i18n="pg_i_conv_iso"></dd></div>
+          </dl>
+          <dl id="pg-info-valve" class="info" hidden>
+            <div><dt data-i18n="pg_i_what_k">Prova</dt><dd data-i18n="pg_i_valve_what"></dd></div>
+            <div><dt data-i18n="pg_i_t90_k">t90</dt><dd data-i18n="pg_i_valve_t90"></dd></div>
+            <div><dt data-i18n="pg_i_db_k">Banda Morta</dt><dd data-i18n="pg_i_valve_db"></dd></div>
+            <div><dt data-i18n="pg_i_load_k">Carico</dt><dd data-i18n="pg_i_valve_load"></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+    <footer class="footer">
+    IO Tester · Firmware <span id="fw" class="fw-ver">0.0.6</span> ·
+    <a href="diag.html" data-i18n="fn_diag">Diagnostica</a>
+    </footer>
+  </main>
+  </div>
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+</body>
+</html>
